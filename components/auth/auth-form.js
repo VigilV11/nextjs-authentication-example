@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react';
 import classes from './auth-form.module.css';
+import { signIn } from 'next-auth/client';
 
+// FUNCTION to create a new user accout
 async function createUser(email, password) {
   const response = await fetch('api/auth/signup', {
     method: 'POST',
@@ -29,7 +31,7 @@ function AuthForm() {
     setIsLogin((prevState) => !prevState);
   }
 
-  function submitHandler(e) {
+  async function submitHandler(e) {
     e.preventDefault();
 
     const enteredEmail = emailRef.current.value;
@@ -39,10 +41,20 @@ function AuthForm() {
 
     if (isLogin) {
       // log user in
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: enteredEmail,
+        password: enteredPassword,
+      });
+
+      if (!result.error) {
+        window.location.href = '/profile';
+      }
+      // console.log(result);
     } else {
       // create user
       const data = createUser(enteredEmail, enteredPassword);
-      console.log(data);
+      // console.log(data);
     }
   }
 
